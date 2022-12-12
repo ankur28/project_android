@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">projectAndroid</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="problem">Problem with the geolocation service</string>
+    <string name="invalid">Invalid LatLng</string>
+    <string name="noaddress">No address found</string>
+    <string name="g_maps">Google Maps</string>
+    <string name="g_places">Google PLaces</string>
+    <string name="email">Email</string>
+    <string name="about">About</string>
+
 </resources>
