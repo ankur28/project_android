@@ -61,6 +61,8 @@ class PlacesActivity : AppCompatActivity() {
             true
         }
         R.id.about -> {
+            startActivity(Intent(this,AboutActivity::class.java))
+
             Toast.makeText(this@PlacesActivity, "About selected", Toast.LENGTH_SHORT).show()
             true
         }

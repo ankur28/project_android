@@ -9,6 +9,8 @@
     <string name="email">Email</string>
     <string name="about">About</string>
     <string name="name">Name</string>
+    <string name="members">Ankur Kalson, Akash Cheruvil Bijumon, Arjun Sumesh, Aravind Vattapalli</string>
+    <string name="About">This a Google maps application which has 4 menu options Google maps which shows current location , google places which shows the 5 places around the current location, email which is used to open a email client by entering an email and about page .</string>
     <string name="api_key">AIzaSyBRzj5cMXPJeccBGubmb-DyFjeccOU4iz0</string>
 
 </resources>

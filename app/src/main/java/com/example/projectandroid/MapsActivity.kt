@@ -114,6 +114,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             true
         }
         R.id.about -> {
+            startActivity(Intent(this,AboutActivity::class.java))
+
             Toast.makeText(this@MapsActivity, "About selected", Toast.LENGTH_SHORT).show()
             true
         }
