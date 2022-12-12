@@ -5,8 +5,9 @@
     <string name="invalid">Invalid LatLng</string>
     <string name="noaddress">No address found</string>
     <string name="g_maps">Google Maps</string>
-    <string name="g_places">Google PLaces</string>
+    <string name="g_places">Google Places</string>
     <string name="email">Email</string>
     <string name="about">About</string>
+    <string name="api_key">AIzaSyBRzj5cMXPJeccBGubmb-DyFjeccOU4iz0</string>
 
 </resources>

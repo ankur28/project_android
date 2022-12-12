@@ -2,6 +2,7 @@ package com.example.projectandroid
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
 import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
@@ -21,12 +22,22 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.projectandroid.databinding.ActivityMapsBinding
+import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.GroundOverlayOptions
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.model.PlaceLikelihood
+import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
+import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse
+import com.google.android.libraries.places.api.net.PlacesClient
 import java.io.IOException
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -35,6 +46,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val REQUEST_LOCATION_PERMISSION = 1
 
+    private var mPlacesClient: PlacesClient? = null
+    private val M_MAX_ENTRIES = 5
+    private lateinit var mLikelyPlaceNames: Array<String>
+    private lateinit var mLikelyPLaceAddresses: ArrayList<String>
+    private lateinit var mLikelyPlaceLatLngs: ArrayList<LatLng>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -46,6 +62,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        val apikey = getString (R.string.api_key)
+        Places.initialize(applicationContext, apikey)
+        mPlacesClient = Places.createClient(this)
+        mLikelyPlaceNames = arrayOf<String>("","","","","")
+        mLikelyPLaceAddresses = ArrayList<String>(5)
+        mLikelyPlaceLatLngs = ArrayList<LatLng>(5)
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -67,7 +90,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         // Change the map type based on the user's selection.
         R.id.gMap -> {
             Toast.makeText(this@MapsActivity, "Maps selected", Toast.LENGTH_SHORT).show()
-
             true
         }
         R.id.gPlaces -> {
@@ -143,9 +165,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 it.apply {
 
                     var current_location = LatLng(latitude,longitude)
-                    var address =    getAddress(current_location)
+                    var address = getAddress(current_location)
                     mMap.addMarker(MarkerOptions().position(current_location)
-                        .title("Ankur Kalson's current location")
+                        .title("Lat: "+latitude+", Lon: "+longitude)
                         .snippet(address))
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(current_location))
 
@@ -160,4 +182,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             )
         }
     }
+
+
 }
