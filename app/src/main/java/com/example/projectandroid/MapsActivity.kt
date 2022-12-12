@@ -3,6 +3,7 @@ package com.example.projectandroid
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
@@ -45,6 +46,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMapsBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val REQUEST_LOCATION_PERMISSION = 1
+    lateinit var placesList: ArrayList<String>
 
     private var mPlacesClient: PlacesClient? = null
     private val M_MAX_ENTRIES = 5
@@ -62,6 +64,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        placesList = ArrayList()
 
         val apikey = getString (R.string.api_key)
         Places.initialize(applicationContext, apikey)
@@ -69,6 +72,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mLikelyPlaceNames = arrayOf<String>("","","","","")
         mLikelyPLaceAddresses = ArrayList<String>(5)
         mLikelyPlaceLatLngs = ArrayList<LatLng>(5)
+        getCurrentPlaceLikelihoods()
+        println("plist: "+placesList)
+
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -87,12 +93,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
 
-        // Change the map type based on the user's selection.
         R.id.gMap -> {
             Toast.makeText(this@MapsActivity, "Maps selected", Toast.LENGTH_SHORT).show()
             true
         }
         R.id.gPlaces -> {
+
+            val intent = Intent(this,
+                PlacesActivity::class.java).apply {
+                putExtra("data",placesList)
+
+            }
+            startActivity(intent)
+            //  startActivity(Intent(this,PlacesActivity::class.java))
+
             Toast.makeText(this@MapsActivity, "Places selected", Toast.LENGTH_SHORT).show()
             true
         }
@@ -182,6 +196,68 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             )
         }
     }
+
+    private fun getCurrentPlaceLikelihoods() {
+        // Use fields to define the data types to return.
+        val placeFields = Arrays.asList(
+            Place.Field.NAME, Place.Field.ADDRESS,
+            Place.Field.LAT_LNG
+        )
+
+        // Get the likely places - that is, the businesses and other points of interest that
+        // are the best match for the device's current location.
+        val request = FindCurrentPlaceRequest.builder(placeFields).build()
+        val placeResponse: Task<FindCurrentPlaceResponse> =
+            mPlacesClient!!.findCurrentPlace(request)
+        placeResponse.addOnCompleteListener(this,
+            OnCompleteListener<FindCurrentPlaceResponse?> { task ->
+                if (task.isSuccessful) {
+                    val response = task.result
+                    // Set the count, handling cases where less than 5 entries are returned.
+                    val count: Int
+                    if (response.placeLikelihoods.size < M_MAX_ENTRIES) {
+                        count = response.placeLikelihoods.size
+                    } else {
+                        count = M_MAX_ENTRIES
+                    }
+                    println("Found a place")
+                    var i = 0
+                    for (placeLikelihood: PlaceLikelihood in response.placeLikelihoods) {
+                        val currPlace = placeLikelihood.place
+                        mLikelyPlaceNames[i] = (currPlace.name)
+                        placesList.add(currPlace.name)
+
+                        Log.i(TAG,currPlace.name)
+                        mLikelyPLaceAddresses.add(currPlace.address)
+                        mLikelyPlaceLatLngs.add(currPlace.latLng)
+                        val currLatLng =
+                            if (mLikelyPlaceLatLngs[i] == null) "" else mLikelyPlaceLatLngs[i].toString()
+                        Log.i(
+                            TAG, String.format(
+                                "Place " + currPlace.name
+                                        + " has likelihood: " + placeLikelihood.likelihood
+                                        + " at " + currLatLng
+                            )
+                        )
+                        i++
+                        if (i > (count - 1)) {
+                            break
+                        }
+                    }
+
+                    Toast.makeText(this@MapsActivity, "Places loaded", Toast.LENGTH_SHORT).show()
+
+//                    recyclerView.adapter = RecyclerAdapter(mLikelyPlaceNames)  // pass in data to be displayed
+//                    viewAdapter.notifyDataSetChanged()
+                } else {
+                    val exception: Exception? = task.getException()
+                    if (exception is ApiException) {
+                        Log.e(TAG, "Place not found: " + exception.statusCode)
+                    }
+                }
+            })
+    }
+
 
 
 }

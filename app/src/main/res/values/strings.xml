@@ -8,6 +8,7 @@
     <string name="g_places">Google Places</string>
     <string name="email">Email</string>
     <string name="about">About</string>
+    <string name="name">Name</string>
     <string name="api_key">AIzaSyBRzj5cMXPJeccBGubmb-DyFjeccOU4iz0</string>
 
 </resources>
