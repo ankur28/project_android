@@ -93,10 +93,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
 
-        R.id.gMap -> {
-            Toast.makeText(this@MapsActivity, "Maps selected", Toast.LENGTH_SHORT).show()
-            true
-        }
+
         R.id.gPlaces -> {
 
             val intent = Intent(this,
@@ -111,6 +108,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             true
         }
         R.id.email -> {
+              startActivity(Intent(this,EmailActivity::class.java))
+
             Toast.makeText(this@MapsActivity, "Email selected", Toast.LENGTH_SHORT).show()
             true
         }

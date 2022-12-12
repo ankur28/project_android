@@ -50,12 +50,13 @@ class PlacesActivity : AppCompatActivity() {
     }
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.gMap -> {
-              startActivity(Intent(this,PlacesActivity::class.java))
+              startActivity(Intent(this,MapsActivity::class.java))
 
             Toast.makeText(this@PlacesActivity, "Maps selected", Toast.LENGTH_SHORT).show()
             true
         }
         R.id.email -> {
+            startActivity(Intent(this,EmailActivity::class.java))
             Toast.makeText(this@PlacesActivity, "Email selected", Toast.LENGTH_SHORT).show()
             true
         }
