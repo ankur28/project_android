@@ -1,15 +1,16 @@
 package com.example.projectandroid
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
 
 
 class PlacesActivity : AppCompatActivity() {
@@ -22,12 +23,7 @@ class PlacesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_places)
         recyclerView = findViewById(R.id.recycler_view)
-        pList= ArrayList()
-
-        val bundle = intent.extras
-        if (bundle != null) {
-            pList = bundle.getStringArrayList("data") as ArrayList<String>
-        }
+        pList= getFromSharedPrefs() as ArrayList<String>
 
         addDataInRecyclerView(pList)
     }
@@ -69,9 +65,29 @@ class PlacesActivity : AppCompatActivity() {
         else -> super.onOptionsItemSelected(item)
     }
 
+    fun getFromSharedPrefs(): Any? {
+
+        val sharedPreferences = applicationContext.getSharedPreferences("mysettings",
+            AppCompatActivity.MODE_PRIVATE
+        )
+        val gson = Gson()
+
+        val json = sharedPreferences.getString("places_data","")
+        val type: Type = object : TypeToken<ArrayList<String?>?>() {}.type
+        val placesData: List<String> = gson.fromJson<List<String>>(json, type)
+
+
+        if (json != null && json.length > 0) {
+            return placesData
+        }else{
+            return ArrayList<String>()
+        }
+
+    }
 
     override fun onRestart() {
         super.onRestart()
+        pList= getFromSharedPrefs() as ArrayList<String>
         addDataInRecyclerView(pList)
     }
 }

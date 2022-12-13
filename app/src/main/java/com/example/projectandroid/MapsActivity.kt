@@ -3,6 +3,7 @@ package com.example.projectandroid
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Address
@@ -36,6 +37,7 @@ import com.google.android.libraries.places.api.model.PlaceLikelihood
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse
 import com.google.android.libraries.places.api.net.PlacesClient
+import com.google.gson.Gson
 import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
@@ -47,7 +49,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val REQUEST_LOCATION_PERMISSION = 1
     lateinit var placesList: ArrayList<String>
-
+    var currenLocation_forEmail: String = ""
+    var address_forEmail: String = ""
     private var mPlacesClient: PlacesClient? = null
     private val M_MAX_ENTRIES = 5
     private lateinit var mLikelyPlaceNames: Array<String>
@@ -96,19 +99,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         R.id.gPlaces -> {
 
-            val intent = Intent(this,
-                PlacesActivity::class.java).apply {
-                putExtra("data",placesList)
 
-            }
-            startActivity(intent)
-            //  startActivity(Intent(this,PlacesActivity::class.java))
+            val sharedPreferences = applicationContext.getSharedPreferences("mysettings",
+                AppCompatActivity.MODE_PRIVATE
+            )
+
+            val editor = sharedPreferences.edit()
+            val gson = Gson()
+            val json: kotlin.String = gson.toJson(placesList)
+            editor.putString("places_data", json)
+            editor.apply()
+
+            startActivity(Intent(this,PlacesActivity::class.java))
 
             Toast.makeText(this@MapsActivity, "Places selected", Toast.LENGTH_SHORT).show()
             true
         }
         R.id.email -> {
-              startActivity(Intent(this,EmailActivity::class.java))
+
+            startActivity(Intent(this,EmailActivity::class.java))
 
             Toast.makeText(this@MapsActivity, "Email selected", Toast.LENGTH_SHORT).show()
             true
@@ -116,6 +125,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         R.id.about -> {
             startActivity(Intent(this,AboutActivity::class.java))
 
+            startActivity(intent)
             Toast.makeText(this@MapsActivity, "About selected", Toast.LENGTH_SHORT).show()
             true
         }
@@ -178,14 +188,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             mMap.isMyLocationEnabled = true
             fusedLocationClient.lastLocation.addOnSuccessListener {
                 it.apply {
-
+                    currenLocation_forEmail= "Lat: ${latitude}, Lon: ${longitude}"
                     var current_location = LatLng(latitude,longitude)
                     var address = getAddress(current_location)
+                    address_forEmail = address.toString()
                     mMap.addMarker(MarkerOptions().position(current_location)
                         .title("Lat: "+latitude+", Lon: "+longitude)
                         .snippet(address))
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(current_location))
 
+                    val sharedPreferences = applicationContext.getSharedPreferences("mysettings",
+                        AppCompatActivity.MODE_PRIVATE
+                    )
+                    val editor = sharedPreferences.edit()
+                    editor.putString("location", currenLocation_forEmail)
+                    editor.putString("address", address_forEmail)
+                    editor.apply()
                 }
             }
         }

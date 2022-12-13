@@ -30,8 +30,8 @@ class AboutActivity : AppCompatActivity() {
             Toast.makeText(this@AboutActivity, "Email selected", Toast.LENGTH_SHORT).show()
             true
         }
-        R.id.email -> {
-            startActivity(Intent(this,EmailActivity::class.java))
+        R.id.gPlaces -> {
+            startActivity(Intent(this,PlacesActivity::class.java))
 
             Toast.makeText(this@AboutActivity, "About selected", Toast.LENGTH_SHORT).show()
             true
