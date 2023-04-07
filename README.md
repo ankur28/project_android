@@ -1,2 +1,1 @@
-# project_android
-MAPS_API_KEY=AIzaSyDl3vHKB62QDkVEectK4AkVoSFNr-eCDmU
+
